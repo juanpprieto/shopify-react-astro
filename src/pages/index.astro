@@ -1,35 +1,16 @@
 ---
 import ProductListing from '../components/ProductListing.jsx';
-
+import MainLayout from '../layouts/main.astro'
 let products = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product-list`).then(res => res.json()).then((response) => {
     return response.products.edges
   });
 
 ---
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cheese and Meat Shop</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="stylesheet" href="/style/global.css">
-</head>
-<body>
-  <main>
-    <header>
-      <h1>Shoperoni</h1>
-      <h2>Shop for literally the best products in the world, right here.</h2>
-    </header>
-    
-    <a class="cart" href="https://github.com">Shopping Cart</a>
-
-    <ul class="products">
-      {products.map((p) => {
-        return <ProductListing product={p.node} />
-      })}
-    </ul>
-  </main>
-</body>
-</html>
+<MainLayout title={'products'}>
+  <ul class="products">
+    {products.map((p) => {
+      return <ProductListing product={p.node} />
+    })}
+  </ul>
+</MainLayout>

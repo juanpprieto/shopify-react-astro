@@ -1,0 +1,30 @@
+---
+// src/layouts/BaseLayout.astro
+const {title} = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <title>Buy {collection.data.title}</title> -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/style/global.css">
+    <title>Example Layout: {title}</title>
+  </head>
+  <body>
+    <!-- Adds a navigation bar to every page. -->
+    <header>
+        <h1>Shoperoni</h1>
+        <h2>Shop for literally the best products in the world, right here.</h2>
+        <nav>
+          <a class="home" href="/">Go back</a>
+          <a class="cart" href="https://github.com">Shopping Cart</a>
+        </nav>
+    </header>
+    <main>
+      <!-- slot: your page content will be injected here. -->
+      <slot />
+    </main>
+  </body>
+</html>

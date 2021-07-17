@@ -1,9 +1,9 @@
 ---
 const { collection } = Astro.props;
 import ProductPageContent from '../components/ProductPageContent.jsx';
+import MainLayout from '../layouts/main.astro'
 
 export async function createCollection() {
-  // let products = await pullData();
 
   let products = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product-list`)
     .then(res => res.json()).then((response) => {
@@ -13,42 +13,26 @@ export async function createCollection() {
   return {
     // `routes` defines the total collection of routes as data objects.
     routes: products.map((p, i) => {
-      const params = {prod: p.node.handle, index: i};
+      const params = {handle: p.node.handle, index: i};
       return params;
     }),
-    permalink: ({ params }) => { 
-      return `/product/${params.prod}`
+    permalink: ({ params }) => {
+      return `/product/${params.handle}`
     },
     async data({ params }) {
-      return products.filter((p) => {
-        return p.node.handle === params.prod;
-      });
+      // return products.filter((p) => {
+      //   return p.node.handle === params.handle;
+      // });
+
+      const fullProductResponse = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product?handle=${params.handle}`)
+      const fullProduct = await fullProductResponse.json()
+      return fullProduct
+
     },
     pageSize: Infinity,
   };
 }
 ---
-
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Buy {collection.data[0].node.title}</title>
-
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="stylesheet" href="/style/global.css">
-</head>
-<body>
-    <main>
-        <header>
-            <h1>Shoperoni</h1>
-            <h2>Shop for literally the best products in the world, right here.</h2>
-        </header>
-        <a class="home" href="/">Go back</a>
-        <a class="cart" href="https://github.com">Shopping Cart</a>
-
-        <ProductPageContent:visible product={collection.data[0].node} />
-    </main>
-</body>
-</html>
+<MainLayout title={'product'}>
+  <ProductPageContent:visible product={collection.data[0]} />
+</MainLayout>
