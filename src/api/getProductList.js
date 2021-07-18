@@ -1,24 +1,7 @@
-/**
- * API Endpoint
- *
- * Purpose: Fetch first 100 products of the store
- *
- * Example:
- * ```
- * fetch('/.netlify/functions/get-product-list', {
- *   method: 'POST'
- * })
- * ```
- *
- * ! POST method is intentional for future enhancement
- *
- * TODO: Add enhancement for pagination
- */
+import postToShopify from './postToShopify.js'
+import Cache from './Cache'
 
-const { postToShopify } = require('./utils/postToShopify')
-const Cache = require('./utils/Cache')
-
-exports.handler = async () => {
+export default async () => {
   try {
     console.log('--------------------------------')
     console.log('Retrieving product list...')
@@ -74,20 +57,14 @@ exports.handler = async () => {
           `,
         })
 
-      console.log('getProductList:shopifyResponse', shopifyResponse)
-      Cache.set('getProductList', shopifyResponse)
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify(shopifyResponse),
-      }
+      if (!shopifyResponse?.products?.edges) return null
+      console.log('Using 📡 fetched products list')
+      Cache.set('getProductList', shopifyResponse.products.edges)
+      return shopifyResponse.products.edges
     } else {
-      const shopifyResponse = Cache.get('getProductList')
-      console.log('Using cached products response')
-      return {
-        statusCode: 200,
-        body: JSON.stringify(shopifyResponse),
-      }
+      const cachedProductList = Cache.get('getProductList')
+      console.log(`Using 🏧 cached products list`)
+      return cachedProductList
     }
   } catch (error) {
     console.log(error)

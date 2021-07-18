@@ -51,17 +51,15 @@ function VariantForm({ vars, current, pick, setQ }) {
 }
 
 export default function ProductPageContent({ product }) {
+  if (!product?.variants) return <p>No product</p>
   let vars = product.variants.edges
 
   const [chosenVariant, setChosenVariant] = useState(vars[0].node.id)
   const [quantity, setQuantity] = useState(1)
   const [cost, setCost] = useState('')
 
-  console.log(vars)
-
   useEffect(() => {
-    let variantPrice = getCurrentVariantObject(vars, chosenVariant).node.priceV2
-      .amount
+    let variantPrice = getCurrentVariantObject(vars, chosenVariant).node.priceV2.amount
 
     setCost(formatPrice(variantPrice * quantity))
   }, [chosenVariant, quantity, cost])

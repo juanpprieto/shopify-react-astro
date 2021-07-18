@@ -8,6 +8,12 @@
     "build": "astro build"
   },
   "devDependencies": {
-    "astro": "^0.15.1"
-  }
+    "astro": "^0.17.2"
+  },
+  "dependencies": {
+    "@snowpack/plugin-dotenv": "^2.1.0",
+    "es6-promise": "^4.2.8",
+    "isomorphic-fetch": "^3.0.0"
+  },
+  "type": "module"
 }

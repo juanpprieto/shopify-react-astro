@@ -1,16 +1,18 @@
 ---
 import ProductListing from '../components/ProductListing.jsx';
 import MainLayout from '../layouts/main.astro'
-let products = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product-list`).then(res => res.json()).then((response) => {
-    return response.products.edges
-  });
+import getProductList from '../api/getProductList.js'
 
+let products = await getProductList()
 ---
 
 <MainLayout title={'products'}>
   <ul class="products">
-    {products.map((p) => {
-      return <ProductListing product={p.node} />
-    })}
+    {products?.length
+      ? products.map((p) => {
+          return <ProductListing product={p.node} key={p.handle} />
+        })
+      : null
+    }
   </ul>
 </MainLayout>

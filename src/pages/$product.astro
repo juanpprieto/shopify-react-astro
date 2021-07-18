@@ -2,37 +2,37 @@
 const { collection } = Astro.props;
 import ProductPageContent from '../components/ProductPageContent.jsx';
 import MainLayout from '../layouts/main.astro'
+import getProductList from '../api/getProductList.js'
+import getProductByHandle from '../api/getProductByHandle.js'
 
 export async function createCollection() {
-
-  let products = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product-list`)
-    .then(res => res.json()).then((response) => {
-      return response.products.edges
-    });
+  const products = await getProductList()
+  const productRoutes = products.length
+    ? products.map((product, i) => {
+        const params = { handle: product.node.handle  };
+        return params;
+      })
+    : []
 
   return {
-    // `routes` defines the total collection of routes as data objects.
-    routes: products.map((p, i) => {
-      const params = {handle: p.node.handle, index: i};
-      return params;
-    }),
+    routes: productRoutes,
     permalink: ({ params }) => {
       return `/product/${params.handle}`
     },
     async data({ params }) {
-      // return products.filter((p) => {
-      //   return p.node.handle === params.handle;
-      // });
+      const fullProduct = params?.handle
+        ? await getProductByHandle(params.handle)
+        : {}
 
-      const fullProductResponse = await fetch(`${import.meta.env.NETLIFY_URL}/.netlify/functions/get-product?handle=${params.handle}`)
-      const fullProduct = await fullProductResponse.json()
-      return fullProduct
-
+      return {...params, ...fullProduct }
     },
     pageSize: Infinity,
   };
 }
 ---
 <MainLayout title={'product'}>
-  <ProductPageContent:visible product={collection.data[0]} />
+  {collection.data[0]
+    ? <ProductPageContent client:visible product={collection.data[0]} />
+    : null
+  }
 </MainLayout>
