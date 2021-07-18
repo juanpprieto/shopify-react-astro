@@ -54,15 +54,31 @@ export default function ProductPageContent({ product }) {
   if (!product?.variants) return <p>No product</p>
   let vars = product.variants.edges
 
-  const [chosenVariant, setChosenVariant] = useState(vars[0].node.id)
+  const [chosenVariantId, setChosenVariantId] = useState(vars[0].node.id)
+  const [chosenVariant, setChosenVariant] = useState(vars[0].node)
   const [quantity, setQuantity] = useState(1)
   const [cost, setCost] = useState('')
 
+
   useEffect(() => {
-    let variantPrice = getCurrentVariantObject(vars, chosenVariant).node.priceV2.amount
+    let variantPrice = getCurrentVariantObject(vars, chosenVariantId).node.priceV2.amount
 
     setCost(formatPrice(variantPrice * quantity))
-  }, [chosenVariant, quantity, cost])
+  }, [chosenVariantId, quantity, cost])
+
+
+  useEffect(() => {
+    const _chosenVariant = product.variants.edges.find(({ node }) => {
+      if (node.id == chosenVariantId) {
+        return true
+      }
+      return false
+    })
+    if (_chosenVariant) {
+      setChosenVariant(_chosenVariant.node)
+    }
+  }, [chosenVariantId, product])
+
 
   let image = product.images.edges[0].node
 
@@ -73,13 +89,14 @@ export default function ProductPageContent({ product }) {
       </div>
       <div className="product-copy">
         <h1>{product.title}</h1>
+        <h3>{chosenVariant?.title || ''}</h3>
         <h2>{cost}</h2>
         <p>{product.description}</p>
 
         <VariantForm
           vars={vars}
-          current={chosenVariant}
-          pick={setChosenVariant}
+          current={chosenVariantId}
+          pick={setChosenVariantId}
           setQ={setQuantity}
         />
 
