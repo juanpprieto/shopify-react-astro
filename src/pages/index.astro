@@ -2,17 +2,14 @@
 import ProductListing from '../components/ProductListing.jsx';
 import MainLayout from '../layouts/main.astro'
 import getProductList from '../api/getProductList.js'
+import CountProvider from '../context/CountProvider.jsx'
+const { request, ...astro } = Astro
 
 let products = await getProductList()
 ---
 
 <MainLayout title={'products'}>
-  <ul class="products">
-    {products?.length
-      ? products.map((p) => {
-          return <ProductListing product={p.node} key={p.handle} />
-        })
-      : null
-    }
-  </ul>
+  <CountProvider products={products}>
+    <ProductListing client:load products={products} />
+  </CountProvider>
 </MainLayout>
